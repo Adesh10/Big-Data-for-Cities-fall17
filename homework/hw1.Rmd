@@ -9,18 +9,21 @@ Let's get started!
 
 ## Reading in data 
 In this seciton I will be asking you to do some simple reading of the datasets we have been provided as part of this course. First, read in the data called `aggregatedata-final.csv` using the `readr` package in the tidyverse. Assign it to a variable called `agg_sensor_data`
+library(tidyverse)
 
-```{r}
+`agg_sensor_data<-read.csv("~/Desktop/data+docs/data/aggregatedata-final.csv")
+``{r}
 ```
 
 Okay, now read in `sensor_data_city-MT.tab` using `readr` and assign it to a variable called `sensor_data_MT`
 
-```{r}
+
+``sensor_data_MT<-read_tsv("~/Desktop/data+docs/data/sensor_data_city-MT.tsv")`{r}
 ```
 
 Read in the previous data set and set all columns to character. This is a helpful trick if your data is very problematic. Don't assign it to anything though.
 
-```{r}
+`c(sensor_data_MT)``{r}
 ```
 
 ## Data transform
@@ -28,25 +31,40 @@ Okay now we are going to move into transforming your data.
 
 Using `sensor_data_MT` create a data summary data frame, using only dplyr(`group_by`, `summarise`, `filter`, `arrange`, `select`, `mutate`). This summary table should report the variance, mean, and median for each sensor. Assign this to a variable called `sensor_summary`. Ensure you print the data frame so it shows up in your notebook.
 
-```{r}
+`library(dplyr)
+table(.data=sensor_data_MT$sensor)
+grouped_sensor_data_MT<-group_by(sensor_data_MT,sensor)
+grouped_sensor_data_MT
+class(grouped_sensor_data_MT)
+sensor_summary <- summarise(grouped_sensor_data_MT,avg_values=mean(value),median_value=median(value),variance_value=var(value))``{r}
 
 ```
 
 Now count the number of records in `agg_sensor_data` are recorded for the daytime, according to the `day_flg` vector, and how many readings are recorded for the night. Remove morning observations.
-```{r}
+``select(agg_sensor_data,day_flg,day)
+table(.data=agg_sensor_data$day_flg)`{r}
 ```
 
 Create a new column in `sensor_data_MT` which is the `timestamp` vector cast as a vector of class date instead of character. You will need to use `lubridate` for this.
 
-```{r}
+``library(lubridate)
+sensor_data_MT$timestamp`{r}
 ```
 
 Using `sensor_data_MT` answer the following: During which hour(s) did sensor GP_HUM with an `id_wasp` value of city2 receive the highest reading for `value`?
-```{r}
+``V<-filter(.data = sensor_data_MT,sensor=="GP_HUM",id_wasp=="city2")
+arrange(V,desc(value))
+sensor_summary2<-summarise(V,avg_values=mean(value),median_value=median(value),variance_value=var(value),standarddeviation_value=sd(value),maximum_value=which.max(value))`{r}
 ```
 
 What is the mean, variance, standard deviation, median, max, and min for each `sensor` during each time period in `day_flg`?
-```{r}
+``M<-filter(.data=sensor_data_MT,day_flg=="morning")
+morning_summary<-summarise(M,avg_values=mean(value),median_value=median(value),variance_value=var(value),standarddeviation_value=sd(value),maximum_value=which.max(value),minimum_value=which.min(value))
+D<-filter(.data=sensor_data_MT,day_flg=="day")
+day_summary<-summarise(D,avg_values=mean(value),median_value=median(value),variance_value=var(value),standarddeviation_value=sd(value),maximum_value=which.max(value),minimum_value=which.min(value))
+N<-filter(.data=sensor_data_MT,day_flg=="night")
+night_summary<-summarise(N,avg_values=mean(value),median_value=median(value),variance_value=var(value),standarddeviation_value=sd(value),maximum_value=which.max(value),minimum_value=which.min(value))
+`{r}
 ```
 
 Show the previous data frame with only entries which were the highest mean value for a given `sensor`. Show a second dataframe, again built off the last, which shows only entries which got the smallest mean value for each `day_flg`.
